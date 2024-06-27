@@ -4,26 +4,25 @@ on:
   pull_request:
     types:
       - opened
-      - reopened
       - synchronize
       - ready_for_review
-    branches:
-      - master
-      - production
-
 permissions: write-all
-
 jobs:
   review:
+    if: '! github.event.pull_request.draft'                                       # Only run on non-draft pull requests. Must be coupled with the ready_for_review event above.
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
 
       - name: AI Code Reviewer
-        uses: piyushkukrejaivs/ai-codereviewer@main
+        uses: piyushkukreja/ai-codereviewer@dev
         with:
-          GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          OPENAI_API_MODEL: "gpt-4"
-          exclude: ""
+          GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}                               # Keep this line verbatim. GitHub sets secrets.GITHUB_TOKEN automatically, it just needs to be plumbed into the action. See https://docs.github.com/en/actions/security-guides/automatic-token-authentication#about-the-github_token-secret for more information.
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}                           # Your OpenAI key. Create one at https://platform.openai.com/api-keys. Set it in your repository under Settings -> Secrets and variables -> Actions -> Repository Secrets.
+          OPENAI_API_MODEL: "gpt-4"                                               # Optional: The OpenAI model (https://platform.openai.com/docs/models) to use. Defaults to "gpt-4". Prefer models with JSON Mode (https://platform.openai.com/docs/guides/text-generation/json-mode) support.
+          exclude: "yarn.lock, dist/**, **/*.json, **/*.md, **/*.yaml, **/*.xml"  # Optional: File patterns, separated by commas, to exclude from analysis.
+          custom_prompts: |                                                       # Optional: Custom commands to add to the prompt used to analyze code. This is a multiline string, where each line is an individual command.
+             Do not worry about the verbosity of variable names, as long as they are somewhat descriptive.
+             Be sure to call out potential null pointer exceptions.
+             Be sure to call out concurrency issues and potential race conditions.
