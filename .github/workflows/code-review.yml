@@ -2,6 +2,11 @@ name: AI Code Reviewer
 
 on:
   pull_request:
+    types:
+      - opened
+      - synchronize
+      - labeled
+      - unlabeled
     branches:
       - master
       - production
@@ -11,6 +16,7 @@ permissions: write-all
 jobs:
   review:
     runs-on: ubuntu-latest
+    if: ${{ github.event.label.name == 'requires-review' }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
@@ -20,5 +26,5 @@ jobs:
         with:
           GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          OPENAI_API_MODEL: "gpt-4" # Optional: defaults to "gpt-4"
+          OPENAI_API_MODEL: "gpt-4"
           exclude: ""
