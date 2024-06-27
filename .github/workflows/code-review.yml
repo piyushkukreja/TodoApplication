@@ -3,10 +3,7 @@ name: AI Code Reviewer
 on:
   pull_request:
     types:
-      - opened
-      - synchronize
-      - labeled
-      - unlabeled
+      - ready_for_review
     branches:
       - master
       - production
@@ -16,7 +13,6 @@ permissions: write-all
 jobs:
   review:
     runs-on: ubuntu-latest
-    if: ${{ github.event.label.name == 'requires-review' }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
