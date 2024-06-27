@@ -7,9 +7,6 @@ on:
       - synchronize
       - labeled
       - unlabeled
-    branches:
-      - master
-      - production
 
 permissions: write-all
 
